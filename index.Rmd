@@ -1,0 +1,150 @@
+---
+title: "JSC370 Final Project"
+author: "Runshi Yang"
+output: 
+    html_document:
+        toc: TRUE
+        toc_float: TRUE
+---
+
+<br>
+
+This is my JSC370 Final Project website. I will showcase a few interactive visuals here.
+
+<br>
+
+```{r setup, message=FALSE, echo=FALSE, warning=FALSE}
+
+library(data.table)
+library(tidyverse)
+library(dplyr)
+library(plotly)
+library(DT)
+library(knitr)
+library(leaflet)
+library(sf)
+library(ggplot2)
+
+# Initialize code chunk options
+opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  eval=TRUE,
+  echo = TRUE,
+  cache = FALSE,
+  fig.width = 7, 
+  fig.align = 'center',
+  fig.asp = 0.618,
+  out.width = "700px",
+  class.source = "code-r")
+```
+
+```{css, echo = FALSE}
+.code-r { /* Code block */
+  font-size: 15px;
+}
+
+.code-r-small { /* Code block */
+  font-size: 10px;
+}
+```
+
+
+```{r load-data, echo=FALSE}
+KSI <- read.csv("https://raw.githubusercontent.com/Runshi-Yang/JSC370/main/assignments/a5/KSI.csv")
+```
+
+
+```{r plot1, class.source="code-r-small", echo=FALSE, results = 'hide'}
+# Load neighborhood shapefile
+neighborhoods <- st_read("Neighbourhoods.geojson")
+
+# Filter KSI data for the time period and location covered by the neighborhood shapefile
+KSI_filtered <- KSI %>%
+  filter(YEAR >= 2006 & YEAR <= 2021) %>%
+  st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = 4326)
+
+# Aggregate KSI data by neighborhood
+collisions_by_neighborhood <- st_join(KSI_filtered, neighborhoods, join = st_intersects) %>%
+  group_by(AREA_NAME) %>%
+  summarize(count = n()) %>%
+  mutate(AREA_NAME = as.character(AREA_NAME))  # Add AREA_NAME column
+
+# Merge neighborhood and collision data
+neighborhoods_collisions <- st_join(neighborhoods, collisions_by_neighborhood)
+
+# Create a leaflet map
+pal <- colorNumeric(palette = "Reds", domain = neighborhoods_collisions$count)
+plot1 <- leaflet(neighborhoods_collisions) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(fillColor = ~pal(count),
+              fillOpacity = 0.8,
+              color = "white",
+              weight = 1,
+              popup = ~paste(AREA_NAME.x, "<br>", "Number of Collisions: ", count)) %>%
+  addLegend(position = "bottomright", 
+            title = "Number of Collisions",
+            pal = pal,
+            values = neighborhoods_collisions$count)
+```
+```{r plot2, class.source="code-r-small", echo=FALSE}
+KSI_filtered1 <- KSI %>%
+  select(YEAR, ROAD_CLASS) %>%
+  group_by(YEAR, ROAD_CLASS) %>%
+  summarise(count = n())
+
+plt_ksi <- ggplot(KSI_filtered1, aes(x = YEAR, y = count, color = ROAD_CLASS)) +
+  geom_line() +
+  labs(title = "Number of KSI Collisions by Road Type and Year",
+       x = "Year",
+       y = "Number of Collisions",
+       color = "Road Type") +
+  theme_minimal()
+
+plot2 <- ggplotly(plt_ksi)
+```
+
+
+```{r plot3, class.source="code-r-small", echo=FALSE}
+# Filter KSI data for alcohol-related collisions only
+KSI_alcohol <- KSI %>%
+  filter(ALCOHOL == TRUE)
+
+# Group the data by year and injury level, and calculate the count of alcohol-related collisions
+KSI_alcohol_by_year <- KSI_alcohol %>%
+  group_by(YEAR, INJURY) %>%
+  summarize(count = n())
+
+# Create a ggplot object with year on the x-axis, count on the y-axis, and injury level as color
+plt_alcohol <- ggplot(KSI_alcohol_by_year, aes(x = YEAR, y = count, color = INJURY)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "Alcohol-Related Collisions by Year and Injury Level", 
+       x = "Year", y = "Count", color = "Injury Level")
+
+# Convert the ggplot object to a plotly object
+plot3 <- ggplotly(plt_alcohol)
+```
+## Interactive Visulations {.tabset}
+
+Create tabs to display each figure
+
+### Map of Toronto KSI
+
+```{r p1, echo=FALSE}
+plot1
+```
+
+### KSI by rode type for each year
+
+```{r p2, echo=FALSE}
+plot2
+```
+
+### Scatterplot: log density
+```{r p3, echo=FALSE}
+plot3
+```
+
+<br>
+<br>
