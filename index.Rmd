@@ -134,17 +134,24 @@ Create tabs to display each figure
 ```{r p1, echo=FALSE}
 plot1
 ```
+The map of Toronto KSI shows that West Humber-Clairville is the most crash-prone neighborhood, followed by the Yonge-Bay Corridor and South Riverdale in downtown. Wexford/Maryvale, Milliken and York University Heights has also experienced a relatively high number of traffic accidents.
+<br>
+
 
 ### KSI by rode type for each year
 
 ```{r p2, echo=FALSE}
 plot2
 ```
+This plot shows that Major and Minor Arterial are the most frequent road types for traffic accidents, and the number of accidents on these two roads gradually decreases as the year progresses. The number of traffic accidents on other roads remained more or less the same.
+<br>
 
-### Scatterplot: log density
+### Alcohol related KSI
 ```{r p3, echo=FALSE}
 plot3
 ```
+This graph shows the trend of crashes related to drunk driving over the years. We can see a rapid decrease in the frequency of drunk driving crashes from 2006 onward, especially a significant decrease in cases that resulted in MAJOR injury and no INJURY.
+<br>
 
-<br>
-<br>
+
+
