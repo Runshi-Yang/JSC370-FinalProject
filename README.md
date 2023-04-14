@@ -1,1 +1,1 @@
-My JSC370 Final Project Website (Link)[https://runshi-yang.github.io/JSC370-FinalProject/]
+My JSC370 Final Project Website https://runshi-yang.github.io/JSC370-FinalProject/
