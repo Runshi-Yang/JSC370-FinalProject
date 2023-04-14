@@ -1,5 +1,5 @@
 ---
-title: "JSC370 Final Project"
+title: "JSC370 Homework 5"
 author: "Runshi Yang"
 output: 
     html_document:
@@ -9,7 +9,7 @@ output:
 
 <br>
 
-This is my JSC370 Final Project website. I will showcase a few interactive visuals here.
+This is my JSC370 Homework 5 website. I will showcase a few interactive visuals here.
 
 <br>
 
